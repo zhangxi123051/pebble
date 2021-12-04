@@ -5,6 +5,8 @@
 package main
 
 import (
+	"fmt"
+	"github.com/cockroachdb/pebble"
 	"log"
 	"os"
 	"time"
@@ -25,6 +27,28 @@ var (
 )
 
 func main() {
+	db, err := pebble.Open("demo-20211204", &pebble.Options{})
+	if err != nil {
+		log.Fatal(err)
+	}
+	key := []byte("hello")
+	if err := db.Set(key, []byte("world"), pebble.Sync); err != nil {
+		log.Fatal(err)
+	}
+	value, closer, err := db.Get(key)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("%s %s\n", key, value)
+	if err := closer.Close(); err != nil {
+		log.Fatal(err)
+	}
+	if err := db.Close(); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func main2() {
 	log.SetFlags(0)
 
 	cobra.EnableCommandSorting = false
